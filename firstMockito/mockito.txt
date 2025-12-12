@@ -1,0 +1,78 @@
+Normal Code (Encapsulation): 
+Imagine a house. You are a guest. 
+You can only enter through the front door (Public methods). 
+You cannot see inside the safe in the bedroom (Private fields) 
+because the door is locked.
+
+Reflection: 
+You are not a guest; 
+you are the Architect (or a Ghost). 
+You don't need a key. 
+You can walk through walls, look inside the locked safe, 
+and even rearrange the furniture while the house is locked.
+
+Reflection allows Java code to inspect and modify itself 
+at runtime, ignoring private/protected barriers.
+
+
+To be precise: Reflection does not change the Class 
+(the Blueprint/Definition). 
+It changes the specific Object (the Instance) in memory.
+
+The Precise Distinction : 
+The Class (BankAccount.class): 
+This is the Blueprint (or the Architect's drawing). 
+Reflection (usually) cannot change this. 
+If the blueprint says "balance is an integer," 
+it stays an integer. 
+We are not rewriting the Java file.
+
+The Object (new BankAccount()): This is the actual House 
+built from the blueprint. 
+Reflection DOES change this specific house.
+
+Correcting the Analogy : 
+When you use Reflection to "move the furniture":
+
+We ARE NOT going to the Architect's office and erasing 
+the walls on the blueprints. (The Class definition is safe).
+
+We ARE breaking into one specific house (The Instance) 
+and moving the sofa, even though the architect said 
+"Don't move this sofa."
+
+
+before mockito : 
+
+public class BankAccount {
+    private int balance = 100; // PRIVATE! No one can touch this.
+
+    public int getBalance() {
+        return balance;
+    }
+}
+
+after mockito : 
+
+import java.lang.reflect.Field;
+
+public class ReflectionDemo {
+    public static void main(String[] args) throws Exception {
+        BankAccount account = new BankAccount();
+        
+        // 1. Get the "Blueprint" of the class
+        Class<?> clazz = account.getClass();
+        
+        // 2. Locate the private field "balance"
+        Field balanceField = clazz.getDeclaredField("balance");
+        
+        // 3. THE MAGIC KEY: Force the lock open
+        balanceField.setAccessible(true);
+        
+        // 4. Modify the private data directly
+        balanceField.set(account, 999999);
+        
+        System.out.println("Hacked Balance: " + account.getBalance()); 
+        // Output: Hacked Balance: 999999
+    }
+}
